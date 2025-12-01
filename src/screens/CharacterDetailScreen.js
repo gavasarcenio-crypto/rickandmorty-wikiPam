@@ -9,10 +9,13 @@ export default function CharacterDetailScreen({ route }) {
   // Carrega os detalhes do personagem ao abrir a tela
   useEffect(() => {
     const loadCharacter = async () => {
-      const response = await api.get(`/character/${id}`);
-      setCharacter(response.data);
+      try {
+        const response = await api.get(`/character/${id}`);
+        setCharacter(response.data); // Salva os dados do personagem
+      } catch (error) {
+        console.error("Erro ao carregar personagem:", error.message);
+      }
     };
-
     loadCharacter();
   }, [id]);
 
