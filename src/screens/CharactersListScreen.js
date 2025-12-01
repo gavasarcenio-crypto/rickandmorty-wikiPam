@@ -5,7 +5,7 @@ import { api } from "../services/api";
 
 export default function CharactersListScreen({ navigation }) {
   const [characters, setCharacters] = useState([]);
-  const [nextPage, setNextPage] = useState("https://rickandmortyapi.com/api/character");
+  const [nextPage, setNextPage] = useState(null);
   const [loading, setLoading] = useState(false);
   const [search, setSearch] = useState("");
 
@@ -17,12 +17,11 @@ export default function CharactersListScreen({ navigation }) {
       const response = await api.get(url.replace(api.defaults.baseURL, ""));
       const data = response.data;
 
-      setCharacters(prev =>
-        isSearch ? data.results : [...prev, ...data.results]
-      );
-      setNextPage(data.info.next);
+      // Atualiza a lista de personagens
+      setCharacters((prev) => (isSearch ? data.results : [...prev, ...data.results]));
+      setNextPage(data.info.next); // Salva a próxima página
     } catch (err) {
-      console.warn("Erro ao carregar personagens");
+      console.error("Erro ao carregar personagens:", err.message);
     }
     setLoading(false);
   };
@@ -42,6 +41,7 @@ export default function CharactersListScreen({ navigation }) {
 
   return (
     <View style={styles.container}>
+      {/* Campo de busca */}
       <TextInput
         placeholder="Buscar personagem..."
         placeholderTextColor="#aaa"
@@ -50,20 +50,19 @@ export default function CharactersListScreen({ navigation }) {
         onChangeText={handleSearch}
       />
 
+      {/* Lista de personagens */}
       <FlatList
         data={characters}
         keyExtractor={(item) => String(item.id)}
         renderItem={({ item }) => (
           <CharacterCard
             item={item}
-            onPress={() =>
-              navigation.navigate("CharacterDetail", { id: item.id })
-            }
+            onPress={() => navigation.navigate("CharacterDetail", { id: item.id })}
           />
         )}
         onEndReached={() => fetchCharacters(nextPage)}
         onEndReachedThreshold={0.2}
-        ListFooterComponent={loading ? <ActivityIndicator size="large" color="#00ff00" /> : null}
+        ListFooterComponent={loading && <ActivityIndicator size="large" color="#00ff00" />}
       />
     </View>
   );
