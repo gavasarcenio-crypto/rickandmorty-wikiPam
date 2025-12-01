@@ -8,12 +8,16 @@ export default function CharacterDetailScreen({ route }) {
 
   useEffect(() => {
     const loadCharacter = async () => {
-      const response = await api.get(`/character/${id}`);
-      setCharacter(response.data);
+      try {
+        const response = await api.get(`/character/${id}`);
+        setCharacter(response.data);
+      } catch (error) {
+        console.error("Erro ao carregar personagem:", error.message);
+      }
     };
 
     loadCharacter();
-  }, []);
+  }, [id]);
 
   if (!character) {
     return (
@@ -26,7 +30,6 @@ export default function CharacterDetailScreen({ route }) {
   return (
     <View style={styles.container}>
       <Image source={{ uri: character.image }} style={styles.image} />
-
       <Text style={styles.name}>{character.name}</Text>
       <Text style={styles.text}>Status: {character.status}</Text>
       <Text style={styles.text}>Espécie: {character.species}</Text>
